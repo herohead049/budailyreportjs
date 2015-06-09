@@ -1,0 +1,15 @@
+{
+  "name": "BUDailyReport",
+  "version": "0.0.1",
+  "description": "Fomrat Daily Email",
+  "main": "index.js",
+  "author": "Craig David",
+  "dependencies": {
+    "cdlib": "^1.1.3",
+    "minimist": "^1.1.1",
+    "moment": "^2.10.3",
+    "moment-timezone": "^0.4.0",
+    "replace": "^0.3.0",
+    "shortid": "^2.2.2"
+  }
+}
