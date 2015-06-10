@@ -95,6 +95,8 @@ function copyFile(source, target, cb) {
     rd.pipe(wr);
 }
 
+// comment
+
 copyFile(replaceConfig.template, replaceConfig.workingFile, function () {
     startReplace();
 });
