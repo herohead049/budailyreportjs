@@ -3,6 +3,7 @@ var redis = require("redis"),
     _ = require('lodash'),
     Hapi = require('hapi');
 
+
 var redisConf = {
     server: cdlib.getRedisAddress(),
     //server: "localhost",
@@ -104,6 +105,21 @@ server.start(function () {
     console.log('Server running at:', server.info.uri);
 });
 
+
+
+var prequest = require('prequest');
+
+prequest('http://localhost:3000/get/emails').then(function (body) {
+  //console.log(body);
+    return body;
+}).then(function (body) {
+    _.forEach(body, function (val, key) {
+        console.log(val);
+    //addEmail("emailKey", val.name, val.email);
+    });
+}).catch(function (err) { // Any HTTP status >= 400 falls here
+  console.error('Failed.', err.statusCode, ' >= 400');
+});
 
 
 

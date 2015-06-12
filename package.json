@@ -11,8 +11,10 @@
     "minimist": "^1.1.1",
     "moment": "^2.10.3",
     "moment-timezone": "^0.4.0",
+    "prequest": "0.0.3",
     "redis": "^0.12.1",
     "replace": "^0.3.0",
+    "request": "^2.57.0",
     "shortid": "^2.2.2"
   }
 }
