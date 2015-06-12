@@ -1,44 +1,110 @@
 var redis = require("redis"),
-    cdlib = require('cdlib');
+    cdlib = require('cdlib'),
+    _ = require('lodash'),
+    Hapi = require('hapi');
 
 var redisConf = {
-    //server: cdlib.getRedisAddress(),
-    server: "localhost",
+    server: cdlib.getRedisAddress(),
+    //server: "localhost",
     port: 6379
 };
 
 var emailList = [
-    {email: 'craig.david@mt.com'
-    },
-    {email: 'herohead@gmail.com'
-    }
-]
+    {name: "craig David", email: 'craig.david@mt.com'},
+    {name: "Craig Gmail", email: 'herohead@gmail.com'},
+    {name: "Craig Gmail", email: 'herohead@gmail.com'}
+];
 
 
+function addEmail(redisKey,key,val) {
+    console.log('Added', val);
+    client.hset(redisKey, key, val);
+}
+
+function delEmail(redisKey,key) {
+    console.log("deleting", key);
+    client.hdel(redisKey, key);
+}
+
+function getEmail(redisKey,callback) {
+    client.hgetall(redisKey, function (err, reply) {
+        //return JSON.stringify(reply);
+        //return reply.toString();
+        callback(JSON.stringify(reply));
+    });
+
+};
 
 client = redis.createClient(redisConf.port,redisConf.server);
 
-
 client.on("error", function (err) {
         console.log("Error " + err);
+});
+
+console.log('Connected to :', redisConf.server);
+/**
+_.forEach(emailList, function (val, key) {
+        //console.log(val.email);
+    addEmail("emailKey", val.name, val.email);
+});
+**/
+//delEmail('emailKey','Craig Gmail');
+
+
+getEmail("emailKey", function (em) {
+    console.log(em);
+});
+
+var server = new Hapi.Server();
+server.connection({ port: 3000 });
+
+server.route({
+    method: 'GET',
+    path: '/',
+    handler: function (request, reply) {
+        reply('Hello, world!');
+    }
+});
+
+server.route({
+    method: 'GET',
+    path: '/get/emails',
+    handler: function (request, reply) {
+          getEmail("emailKey", function (em) {
+          console.log("sending emails");
+      reply(em);
     });
+}
+})
 
-console.log(redisConf.server);
+server.route({
+    method: 'GET',
+    path: '/put/email/{name}',
+    handler: function (request, reply) {
+        var j = JSON.parse(request.params.name);
+        console.log(request.params.name);
+        addEmail("emailKey", j.name, j.email);
+        reply('Hello, ' + encodeURIComponent(request.params.name) + '!');
+    }
+});
 
-client.set("foo_rand000000000000", JSON.stringify(emailList));
+server.route({
+    method: 'GET',
+    path: '/del/email/{name}',
+    handler: function (request, reply) {
+        var j = JSON.parse(request.params.name);
+        console.log(request.params.name);
+        delEmail("emailKey", j.name);
+        reply('Hello, ' + encodeURIComponent(request.params.name) + '!');
+    }
+});
 
-client.get("foo_rand000000000000", function (err, reply) {
-        console.log(reply.toString()); // Will print `OK`
-        console.log(JSON.parse(reply)[0].email);
-    });
 
-client.get(new Buffer("foo_rand000000000000"), function (err, reply) {
-        console.log(reply.toString()); // Will print `<Buffer 4f 4b>`
-    });
+server.start(function () {
+    console.log('Server running at:', server.info.uri);
+});
 
 
-//client.del("foo_rand000000000000", function (err, reply) {
-//        console.log(reply.toString()); // Will print `OK`
-//    });
 
-//client.end();
+
+
