@@ -10,6 +10,7 @@ var fs = require('fs');
 var argv = require('minimist')(process.argv.slice(2));
 var path = require('path');
 var shortid = require('shortid');
+var _ = require('lodash');
 
 function replaceInFile(searchFor, replaceTo, fileName) {
 
@@ -28,7 +29,9 @@ var replaceConfig = {
     regionName: "",
     fileName: "",
     template: "D:/scripts/js/BUdailyReport/html/template.html",
+    //template: "D:/owncloud/js/BUdailyReportjs/html/template.html",
     workingFile: "D:/scripts/js/BUdailyReport/html/working_" + shortid.generate() + ".html",
+    //workingFile: "D:/owncloud/js/BUdailyReportjs/html/working_" + shortid.generate() + ".html",
     webDir: ''
 };
 
@@ -66,8 +69,38 @@ function startReplace() {
         cdlib.msgEmail.htmlData = data;
         cdlib.msgEmail.type = 'html';
         cdlib.msgEmail.subject = "Backup Report Card for - " + replaceConfig.regionName;
-        cdlib.msgEmail.sendToRabbit();
-        fs.unlinkSync(replaceConfig.workingFile);
+        var prequest = require('prequest');
+
+        prequest('http://us01w-davidc:3000/get/emails').then(function (body) {
+  console.log(body);
+            //consoole.log(body);
+            return body;
+        }).then(function (body) {
+            var timeout = 1;
+            
+            _.forEach(body, function (val, key) {
+                console.log(val);
+                
+                setTimeout(function () {
+                    cdlib.msgEmail.to = val;
+                    cdlib.msgEmail.sendToRabbit();
+                },timeout);
+                timeout = timeout + 1000;
+    //addEmail("emailKey", val.name, val.email);
+                
+            });
+            //return;
+        }).then(function () {
+            fs.unlinkSync(replaceConfig.workingFile);
+        }).catch(function (err) { // Any HTTP status >= 400 falls here
+            console.error('Failed.', err.statusCode, ' >= 400');
+            fs.unlinkSync(replaceConfig.workingFile);
+        });
+        
+        
+        
+        //cdlib.msgEmail.sendToRabbit();
+        //fs.unlinkSync(replaceConfig.workingFile);
     });
 
 }

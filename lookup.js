@@ -72,7 +72,7 @@ server.route({
     path: '/get/emails',
     handler: function (request, reply) {
           getEmail("emailKey", function (em) {
-          console.log("sending emails");
+          console.log("sending emails",em);
       reply(em);
     });
 }
