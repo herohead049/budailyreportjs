@@ -3,7 +3,7 @@
 
 "use strict";
 
-var cdlib = require("cdlib");
+var cdlib = require("cdlibjs");
 var moment = require("moment-timezone");
 var replace = require("replace");
 var fs = require('fs');
@@ -11,6 +11,9 @@ var argv = require('minimist')(process.argv.slice(2));
 var path = require('path');
 var shortid = require('shortid');
 var _ = require('lodash');
+
+
+cdlib.rabbitMQ.server = cdlib.getRabbitMQAddress();
 
 function replaceInFile(searchFor, replaceTo, fileName) {
 
@@ -28,9 +31,9 @@ var replaceConfig = {
     timeZone: "",
     regionName: "",
     fileName: "",
-    template: "D:/scripts/js/BUdailyReport/html/template.html",
+    template: "html/template.html",
     //template: "D:/owncloud/js/BUdailyReportjs/html/template.html",
-    workingFile: "D:/scripts/js/BUdailyReport/html/working_" + shortid.generate() + ".html",
+    workingFile: "html/working_" + shortid.generate() + ".html",
     //workingFile: "D:/owncloud/js/BUdailyReportjs/html/working_" + shortid.generate() + ".html",
     webDir: ''
 };
@@ -66,22 +69,22 @@ function startReplace() {
         if (err) {
             return console.log(err);
         }
+        cdlib.msgEmail.from = "craig.david@mt.com";
+        cdlib.msgEmail.smtpServer = "smtp.mt.com";
         cdlib.msgEmail.htmlData = data;
         cdlib.msgEmail.type = 'html';
         cdlib.msgEmail.subject = "Backup Report Card for - " + replaceConfig.regionName;
         var prequest = require('prequest');
 
         prequest('http://us01w-davidc:3000/get/emails').then(function (body) {
-  console.log(body);
-            //consoole.log(body);
+            console.log(body);
             return body;
         }).then(function (body) {
-            var timeout = 1;
-            
             _.forEach(body, function (val, key) {
                 console.log(val);
-                cdlib.msgEmail.to = to;
-                cdlib.sendEMailToRabbit(msgEmail);
+                cdlib.msgEmail.to = val;
+                cdlib.sendEMailToRabbit(cdlib.msgEmail);
+                //console.log(cdlib.msgEmail);
 
     //addEmail("emailKey", val.name, val.email);
                 
