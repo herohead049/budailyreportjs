@@ -80,12 +80,10 @@ function startReplace() {
             
             _.forEach(body, function (val, key) {
                 console.log(val);
-                
-                setTimeout(function () {
-                    cdlib.msgEmail.to = val;
-                    cdlib.msgEmail.sendToRabbit();
-                },timeout);
-                timeout = timeout + 1000;
+                cdlib.msgEmail.to = to;
+                cdlib.msgEmail.route =
+                cdlib.sendEMailToRabbit(msgEmail);
+
     //addEmail("emailKey", val.name, val.email);
                 
             });
