@@ -81,7 +81,7 @@ function startReplace() {
             _.forEach(body, function (val, key) {
                 console.log(val);
                 cdlib.msgEmail.to = to;
-                cdlib.msgEmail.route =
+                cdlib.msgEmail.route = 'email'
                 cdlib.sendEMailToRabbit(msgEmail);
 
     //addEmail("emailKey", val.name, val.email);
