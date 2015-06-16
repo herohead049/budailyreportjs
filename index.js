@@ -31,9 +31,9 @@ var replaceConfig = {
     timeZone: "",
     regionName: "",
     fileName: "",
-    template: "html/template.html",
+    template: "D:/scripts/js/BUDailyReport/html/template.html",
     //template: "D:/owncloud/js/BUdailyReportjs/html/template.html",
-    workingFile: "html/working_" + shortid.generate() + ".html",
+    workingFile: "D:/scripts/js/BUDailyReport/html/working_" + shortid.generate() + ".html",
     //workingFile: "D:/owncloud/js/BUdailyReportjs/html/working_" + shortid.generate() + ".html",
     webDir: ''
 };
