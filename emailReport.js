@@ -7,11 +7,12 @@ var cheerio = require('cheerio');
 var fs = require('fs');
 var argv = require('minimist')(process.argv.slice(2));
 var moment = require("moment");
-var cdlib = require("cdlibjs");
+var cdlibjs = require("cdlibjs");
 var path = require('path');
 var _ = require('lodash');
+var S = require('string');
 
-cdlib.rabbitMQ.server = cdlib.getRabbitMQAddress();
+cdlibjs.rabbitMQ.server = cdlibjs.getRabbitMQAddress();
 
 //var srcFile = path.basename(argv.f);
 var srcFile = argv.f;
@@ -35,26 +36,27 @@ fs.readFile('html/templateV2.html', 'utf8', function read(err, data) {
         s('div.backupreport').replaceWith(q);
         s('div.reportdate').text(rDate);
 
-        var ss = s.html();
+        var ss = s.html(),
+            prequest = require('prequest');
 
 //console.log(ss.xml());
         //writeFile("report.html",ss);
-        cdlib.msgEmail.from = "craig.david@mt.com";
-        cdlib.msgEmail.smtpServer = "smtp.mt.com";
-        cdlib.msgEmail.htmlData = s.html();
-        cdlib.msgEmail.type = 'html';
-        cdlib.msgEmail.subject = "Mettler Toledo Backup Control " + rDate;
-        //cdlib.msgEmail.to = "craig.david@mt.com"
-        var prequest = require('prequest');
-        prequest('http://us01w-davidc:3000/get/emails').then(function (body) {
+
+
+        prequest('http://backupreport.eu.mt.mtnet:8000/get/testEmails').then(function (body) {
             console.log(body);
             return body;
         }).then(function (body) {
             _.forEach(body, function (val, key) {
+                cdlibjs.msgEmail.from = "craig.david@mt.com";
+                cdlibjs.msgEmail.smtpServer = "smtp.mt.com";
+                cdlibjs.msgEmail.htmlData = s.html();
+                cdlibjs.msgEmail.type = 'html';
+                cdlibjs.msgEmail.subject = "Mettler Toledo Backup Control " + rDate;
                 console.log(val);
-                cdlib.msgEmail.to = val;
-                cdlib.sendEMailToRabbit(cdlib.msgEmail);
-                //console.log(cdlib.msgEmail);
+                cdlibjs.msgEmail.to = val;
+                cdlibjs.sendEMailToRabbit(cdlibjs.msgEmail);
+                //console.log(cdlibjs.msgEmail);
 
     //addEmail("emailKey", val.name, val.email);
 
@@ -66,7 +68,7 @@ fs.readFile('html/templateV2.html', 'utf8', function read(err, data) {
             console.error('Failed.', err.statusCode, ' >= 400');
             //fs.unlinkSync(replaceConfig.workingFile);
         });
-        //cdlib.sendEMailToRabbit(cdlib.msgEmail);
+        //cdlibjs.sendEMailToRabbit(cdlibjs.msgEmail);
     });
 });
 
