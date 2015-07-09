@@ -13,7 +13,9 @@ var moment = require("moment");
 var cdlibjs = require("cdlibjs");
 var path = require('path');
 var _ = require('lodash');
-var S = require('string');
+var util = require('../budailyreportjs/lib/cdutils.js');
+
+var emailList = JSON.parse(util.readFile('test/email.conf'));
 
 cdlibjs.rabbitMQ.server = cdlibjs.getRabbitMQAddress();
 
