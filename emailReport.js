@@ -55,7 +55,9 @@ fs.readFile('html/templateV2.html', 'utf8', function read(err, data) {
                 cdlibjs.msgEmail.subject = "Mettler Toledo Backup Control " + rDate;
                 console.log(val);
                 cdlibjs.msgEmail.to = val;
-                cdlibjs.sendEMailToRabbit(cdlibjs.msgEmail);
+                cdlibjs.sendEmailHtml;
+
+                //cdlibjs.sendEMailToRabbit(cdlibjs.msgEmail);
                 //console.log(cdlibjs.msgEmail);
 
     //addEmail("emailKey", val.name, val.email);
