@@ -30,9 +30,10 @@ fs.readFile('html/templateV2.html', 'utf8', function read(err, data) {
         //console.log(srcdata.toString());
         var s1 = cheerio.load(srcdata),
             q = s1('body').html(),
-            reportDateIndex = s.html().indexOf('Date: '),
-            reportDate = s.html().substring(reportDateIndex, reportDateIndex + 19),
+            reportDateIndex = s1.html().indexOf('Date: '),
+            reportDate = s1.html().substring(reportDateIndex, reportDateIndex + 20),
             rDate = moment(reportDate, "MM/DD/YY HH:mm").format("DD-MMM-YYYY HH:mm");
+        //console.log(reportDate);
         s('div.backupreport').replaceWith(q);
         s('div.reportdate').text(rDate);
 
@@ -44,18 +45,21 @@ fs.readFile('html/templateV2.html', 'utf8', function read(err, data) {
 
 
         prequest('http://backupreport.eu.mt.mtnet:8000/get/testEmails').then(function (body) {
-            console.log(body);
+            //console.log(body);
             return body;
         }).then(function (body) {
             _.forEach(body, function (val, key) {
-                cdlibjs.msgEmail.from = "craig.david@mt.com";
-                cdlibjs.msgEmail.smtpServer = "smtp.mt.com";
-                cdlibjs.msgEmail.htmlData = s.html();
-                cdlibjs.msgEmail.type = 'html';
-                cdlibjs.msgEmail.subject = "Mettler Toledo Backup Control " + rDate;
+                var tempMsgEmail = _.clone(cdlibjs, true);
+
+
+                tempMsgEmail.from = "craig.david@mt.com";
+                tempMsgEmail.smtpServer = "smtp.mt.com";
+                tempMsgEmail.htmlData = s.html();
+                tempMsgEmail.type = 'html';
+                tempMsgEmail.subject = "Mettler Toledo Backup Control " + rDate;
                 console.log(val);
-                cdlibjs.msgEmail.to = val;
-                cdlibjs.sendEmailHtml;
+                tempMsgEmail.to = val;
+                cdlibjs.sendEmailHtml(tempMsgEmail);
 
                 //cdlibjs.sendEMailToRabbit(cdlibjs.msgEmail);
                 //console.log(cdlibjs.msgEmail);
