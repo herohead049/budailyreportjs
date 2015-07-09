@@ -1,5 +1,8 @@
 /*jslint nomen: true */
 /*jslint node:true */
+/*jslint vars: true */
+/*jslint es5: true */
+
 
 "use strict";
 
@@ -44,7 +47,7 @@ fs.readFile('html/templateV2.html', 'utf8', function read(err, data) {
         //writeFile("report.html",ss);
 
 
-        prequest('http://backupreport.eu.mt.mtnet:8000/get/testEmails').then(function (body) {
+        prequest('http://backupreport.eu.mt.mtnet:8000/get/emails').then(function (body) {
             //console.log(body);
             return body;
         }).then(function (body) {
