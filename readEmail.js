@@ -15,6 +15,12 @@ var email = {
 };
 **/
 
+
+var email = util.readEmailConf('test/testemail.conf');
+console.log(email.to);
+
+/**
+
 var email = JSON.parse(util.readFile('test/email.conf'));
 
 _.forEach(email.emailToList, function (key, val) {
@@ -23,3 +29,5 @@ _.forEach(email.emailToList, function (key, val) {
 
 var emailFrom = email.emailFrom.email;
 console.log(emailFrom);
+
+**/

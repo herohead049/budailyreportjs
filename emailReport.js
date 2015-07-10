@@ -3,7 +3,6 @@
 /*jslint vars: true */
 /*jslint es5: true */
 
-
 "use strict";
 
 var cheerio = require('cheerio');
@@ -14,8 +13,6 @@ var cdlibjs = require("cdlibjs");
 var path = require('path');
 var _ = require('lodash');
 var util = require('../budailyreportjs/lib/cdutils.js');
-
-var emailList = JSON.parse(util.readFile('test/email.conf'));
 
 cdlibjs.rabbitMQ.server = cdlibjs.getRabbitMQAddress();
 
@@ -42,43 +39,21 @@ fs.readFile('html/templateV2.html', 'utf8', function read(err, data) {
         s('div.backupreport').replaceWith(q);
         s('div.reportdate').text(rDate);
 
-        var ss = s.html(),
-            prequest = require('prequest');
+        var ss = s.html();
 
-//console.log(ss.xml());
-        //writeFile("report.html",ss);
-
-
-        prequest('http://backupreport.eu.mt.mtnet:8000/get/emails').then(function (body) {
-            //console.log(body);
-            return body;
-        }).then(function (body) {
-            _.forEach(body, function (val, key) {
-                var tempMsgEmail = _.clone(cdlibjs, true);
-
-
-                tempMsgEmail.from = "craig.david@mt.com";
-                tempMsgEmail.smtpServer = "smtp.mt.com";
-                tempMsgEmail.htmlData = s.html();
-                tempMsgEmail.type = 'html';
-                tempMsgEmail.subject = "Mettler Toledo Backup Control " + rDate;
-                console.log(val);
-                tempMsgEmail.to = val;
-                cdlibjs.sendEmailHtml(tempMsgEmail);
-
-                //cdlibjs.sendEMailToRabbit(cdlibjs.msgEmail);
-                //console.log(cdlibjs.msgEmail);
-
-    //addEmail("emailKey", val.name, val.email);
-
-            });
-            return body;
-        }).then(function () {
-            //fs.unlinkSync(replaceConfig.workingFile);
-        }).catch(function (err) { // Any HTTP status >= 400 falls here
-            console.error('Failed.', err.statusCode, ' >= 400');
-            //fs.unlinkSync(replaceConfig.workingFile);
+        var email = util.readEmailConf('conf/testemail.conf');
+        _.forEach(email.to, function (val) {
+            var tempMsgEmail = _.clone(cdlibjs, true);
+            tempMsgEmail.from = email.from;
+            tempMsgEmail.smtpServer = email.smtpServer;
+            tempMsgEmail.htmlData = s.html();
+            tempMsgEmail.type = 'html';
+            tempMsgEmail.subject = email.subject + rDate;
+            console.log("Sending email to", val);
+            tempMsgEmail.to = val;
+            cdlibjs.sendEmailHtml(tempMsgEmail);
         });
+
         //cdlibjs.sendEMailToRabbit(cdlibjs.msgEmail);
     });
 });
@@ -92,9 +67,5 @@ function writeFile(file, data) {
         console.log("The file was saved!");
     });
 }
-
-
-
-
 
 
