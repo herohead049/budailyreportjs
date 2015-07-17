@@ -14,18 +14,19 @@ var path = require('path');
 var _ = require('lodash');
 var util = require('../budailyreportjs/lib/cdutils.js');
 
-cdlibjs.rabbitMQ.server = cdlibjs.getRabbitMQAddress();
+var emailReport = {
+    template: 'html/templateV2.html',
+    emailList: 'conf/email.conf',
+    srcFile: argv.f
+};
 
-//var srcFile = path.basename(argv.f);
-var srcFile = argv.f;
-
-fs.readFile('html/templateV2.html', 'utf8', function read(err, data) {
+fs.readFile(emailReport.template, 'utf8', function read(err, data) {
     if (err) {
         throw err;
     }
     var s = cheerio.load(data);
 
-    fs.readFile(srcFile, "utf8", function read(err, srcdata) {
+    fs.readFile(emailReport.srcFile, "utf8", function read(err, srcdata) {
         if (err) {
             throw err;
         }
@@ -41,7 +42,7 @@ fs.readFile('html/templateV2.html', 'utf8', function read(err, data) {
 
         var ss = s.html();
 
-        var email = util.readEmailConf('conf/testemail.conf');
+        var email = util.readEmailConf(emailReport.emailList);
         _.forEach(email.to, function (val) {
             var tempMsgEmail = _.clone(cdlibjs, true);
             tempMsgEmail.from = email.from;
@@ -53,17 +54,5 @@ fs.readFile('html/templateV2.html', 'utf8', function read(err, data) {
             tempMsgEmail.to = val;
             cdlibjs.sendEmailHtml(tempMsgEmail);
         });
-
-        //cdlibjs.sendEMailToRabbit(cdlibjs.msgEmail);
     });
 });
-
-function writeFile(file, data) {
-    var fs = require('fs');
-    fs.writeFile(file, data, "utf8", function (err) {
-        if (err) {
-            return console.log(err);
-        }
-        console.log("The file was saved!");
-    });
-}
