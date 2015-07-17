@@ -60,12 +60,10 @@ fs.readFile('html/templateV2.html', 'utf8', function read(err, data) {
 
 function writeFile(file, data) {
     var fs = require('fs');
-    fs.writeFile(file, data,  "utf8",  function (err) {
+    fs.writeFile(file, data, "utf8", function (err) {
         if (err) {
             return console.log(err);
         }
         console.log("The file was saved!");
     });
 }
-
-
