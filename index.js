@@ -42,21 +42,21 @@ replaceConfig.fileName = path.basename(argv.f);
 replaceConfig.region = argv.r;
 
 switch (replaceConfig.region) {
-case 'EU':
-    replaceConfig.regionName = 'EU Region';
-    replaceConfig.timeZone = 'Europe/Zurich';
-    replaceConfig.webDir = "http://backupreport.eu.mt.mtnet/EUreport/reportcard/" + replaceConfig.fileName;
-    break;
-case 'AP':
-    replaceConfig.regionName = 'AP Region';
-    replaceConfig.timeZone = 'Asia/Kuala_Lumpur';
-    replaceConfig.webDir = "http://backupreport.eu.mt.mtnet/APreport/reportcard/" + replaceConfig.fileName;
-    break;
-case 'AM':
-    replaceConfig.regionName = 'AM Region';
-    replaceConfig.timeZone = 'America/New_York';
-    replaceConfig.webDir = "http://backupreport.eu.mt.mtnet/AMreport/reportcard/" + replaceConfig.fileName;
-    break;
+    case 'EU':
+        replaceConfig.regionName = 'EU Region';
+        replaceConfig.timeZone = 'Europe/Zurich';
+        replaceConfig.webDir = "http://backupreport.eu.mt.mtnet/EUreport/reportcard/" + replaceConfig.fileName;
+        break;
+    case 'AP':
+        replaceConfig.regionName = 'AP Region';
+        replaceConfig.timeZone = 'Asia/Kuala_Lumpur';
+        replaceConfig.webDir = "http://backupreport.eu.mt.mtnet/APreport/reportcard/" + replaceConfig.fileName;
+        break;
+    case 'AM':
+        replaceConfig.regionName = 'AM Region';
+        replaceConfig.timeZone = 'America/New_York';
+        replaceConfig.webDir = "http://backupreport.eu.mt.mtnet/AMreport/reportcard/" + replaceConfig.fileName;
+        break;
 }
 
 function startReplace() {
@@ -76,7 +76,7 @@ function startReplace() {
         cdlib.msgEmail.subject = "Backup Report Card for - " + replaceConfig.regionName;
         var prequest = require('prequest');
 
-        prequest('http://us01w-davidc:3000/get/emails').then(function (body) {
+        prequest('http://backupreport.eu.mt.mtnet:3000/get/emails').then(function (body) {
             console.log(body);
             return body;
         }).then(function (body) {
@@ -86,8 +86,8 @@ function startReplace() {
                 cdlib.sendEMailToRabbit(cdlib.msgEmail);
                 //console.log(cdlib.msgEmail);
 
-    //addEmail("emailKey", val.name, val.email);
-                
+                //addEmail("emailKey", val.name, val.email);
+
             });
             //return;
         }).then(function () {
@@ -96,9 +96,9 @@ function startReplace() {
             console.error('Failed.', err.statusCode, ' >= 400');
             fs.unlinkSync(replaceConfig.workingFile);
         });
-        
-        
-        
+
+
+
         //cdlib.msgEmail.sendToRabbit();
         //fs.unlinkSync(replaceConfig.workingFile);
     });
@@ -109,6 +109,7 @@ function copyFile(source, target, cb) {
     var cbCalled = false,
         rd = fs.createReadStream(source),
         wr = fs.createWriteStream(target);
+
     function done(err) {
         if (!cbCalled) {
             cb(err);
