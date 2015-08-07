@@ -10,6 +10,7 @@
 'use strict';
 
 var cheerio = require('cheerio');
+var async = require('async');
 var fs = require('fs');
 var argv = require('minimist')(process.argv.slice(2));
 var moment = require('moment');
@@ -17,12 +18,31 @@ var cdlibjs = require('cdlibjs');
 //var path = require('path');
 var _ = require('lodash');
 var util = require('../budailyreportjs/lib/cdutils.js');
+var S = require('string');
 
 var emailReport = {
     template: 'html/template.html',
     emailList: 'conf/email.conf',
     srcFile: argv.f
 };
+
+var que = async.queue(function (e, callback) {
+    cdlibjs.sendEmailHtml(e.email);
+    //console.log('hello ' + task.name);
+    callback();
+}, 1);
+
+function addToEmailQueue(eMsg) {
+            que.push({email: eMsg}, function (err) {
+            console.log('finished processing email', eMsg.to);
+        });
+}
+
+
+//console.log(que);
+
+
+
 
 fs.readFile(emailReport.template, 'utf8', function read(err, data) {
     if (err) {
@@ -46,17 +66,37 @@ fs.readFile(emailReport.template, 'utf8', function read(err, data) {
 
         //var ss = s.html();
 
+
+        que.drain = function() {
+            console.log('all items have been processed');
+        };
         var email = util.readEmailConf(emailReport.emailList);
+        var toList = "";
         _.forEach(email.to, function (val) {
-            var tempMsgEmail = _.clone(cdlibjs, true);
-            tempMsgEmail.from = email.from;
-            tempMsgEmail.smtpServer = email.smtpServer;
-            tempMsgEmail.htmlData = s.html();
-            tempMsgEmail.type = 'html';
-            tempMsgEmail.subject = email.subject + rDate;
-            console.log('Sending email to', val);
-            tempMsgEmail.to = val;
-            cdlibjs.sendEmailHtml(tempMsgEmail);
+            toList = toList + val + ',';
+
         });
+
+        console.log(toList.replace(/,\s*$/, ""));
+        //process.exit();
+        var tempMsgEmail = _.clone(cdlibjs, true);
+        tempMsgEmail.from = email.from;
+        //tempMsgEmail.smtpServer = email.smtpServer;
+        tempMsgEmail.smtpServer = 'localhost';
+        tempMsgEmail.htmlData = s.html();
+        tempMsgEmail.type = 'html';
+        tempMsgEmail.subject = email.subject + rDate;
+        //console.log('Sending email to', val);
+        tempMsgEmail.to = toList.replace(/,\s*$/, "");
+        //cdlibjs.sendEmailHtml(tempMsgEmail);
+        addToEmailQueue(tempMsgEmail);
     });
 });
+
+
+
+
+// add some items to the queue
+
+
+
