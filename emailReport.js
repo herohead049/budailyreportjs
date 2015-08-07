@@ -18,7 +18,6 @@ var cdlibjs = require('cdlibjs');
 //var path = require('path');
 var _ = require('lodash');
 var util = require('../budailyreportjs/lib/cdutils.js');
-var S = require('string');
 
 var emailReport = {
     template: 'html/template.html',
@@ -34,7 +33,10 @@ var que = async.queue(function (e, callback) {
 
 function addToEmailQueue(eMsg) {
             que.push({email: eMsg}, function (err) {
-            console.log('finished processing email', eMsg.to);
+            if (err) {
+                console.log(err);
+            }
+                console.log('finished processing email', eMsg.to);
         });
 }
 
@@ -71,13 +73,13 @@ fs.readFile(emailReport.template, 'utf8', function read(err, data) {
             console.log('all items have been processed');
         };
         var email = util.readEmailConf(emailReport.emailList);
-        var toList = "";
+        var toList = '';
         _.forEach(email.to, function (val) {
             toList = toList + val + ',';
 
         });
 
-        console.log(toList.replace(/,\s*$/, ""));
+        console.log(toList.replace(/,\s*$/, ''));
         //process.exit();
         var tempMsgEmail = _.clone(cdlibjs, true);
         tempMsgEmail.from = email.from;
@@ -87,7 +89,7 @@ fs.readFile(emailReport.template, 'utf8', function read(err, data) {
         tempMsgEmail.type = 'html';
         tempMsgEmail.subject = email.subject + rDate;
         //console.log('Sending email to', val);
-        tempMsgEmail.to = toList.replace(/,\s*$/, "");
+        tempMsgEmail.to = toList.replace(/,\s*$/, '');
         //cdlibjs.sendEmailHtml(tempMsgEmail);
         addToEmailQueue(tempMsgEmail);
     });
